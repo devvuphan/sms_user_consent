@@ -56,33 +56,34 @@ class SmsUserConsentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         mActivity = binding.activity
 
         binding.addActivityResultListener { requestCode, resultCode, data ->
-	try {
-
-            when (requestCode) {
-                CREDENTIAL_PICKER_REQUEST -> {// Obtain the phone number from the result
-                    if (resultCode == Activity.RESULT_OK && data != null) {
-                        channel.invokeMethod("selectedPhoneNumber", data.getParcelableExtra<Credential>(Credential.EXTRA_KEY)?.id)
-                    } else {
-                        channel.invokeMethod("selectedPhoneNumber", null)
+	        try {
+                when (requestCode) {
+                    CREDENTIAL_PICKER_REQUEST -> {// Obtain the phone number from the result
+                        if (resultCode == Activity.RESULT_OK && data != null) {
+                            channel.invokeMethod("selectedPhoneNumber", data.getParcelableExtra<Credential>(Credential.EXTRA_KEY)?.id)
+                        } else {
+                            channel.invokeMethod("selectedPhoneNumber", null)
+                        }
+                        true
                     }
-                    true
-                }
-                SMS_CONSENT_REQUEST -> {// Obtain the phone number from the result
-                    if (resultCode == Activity.RESULT_OK && data != null) {
-                        channel
-                                .invokeMethod("receivedSms", data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE))
-                        mActivity.unregisterReceiver(smsVerificationReceiver)
-                    } else {
-                        // Consent denied. User can type OTC manually.
-                        channel.invokeMethod("receivedSms", null)
-                        mActivity.unregisterReceiver(smsVerificationReceiver)
+                    SMS_CONSENT_REQUEST -> {// Obtain the phone number from the result
+                        if (resultCode == Activity.RESULT_OK && data != null) {
+                            channel
+                                    .invokeMethod("receivedSms", data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE))
+                            mActivity.unregisterReceiver(smsVerificationReceiver)
+                        } else {
+                            // Consent denied. User can type OTC manually.
+                            channel.invokeMethod("receivedSms", null)
+                            mActivity.unregisterReceiver(smsVerificationReceiver)
+                        }
+                        true
                     }
-                    true
+                    else -> false
                 }
-                else -> false
+	        } catch(e: Exception) {
+                e.printStackTrace() 
+                false
             }
-	} catch(e: Exception) { e.printStackTrace() }
-
         }
     }
 

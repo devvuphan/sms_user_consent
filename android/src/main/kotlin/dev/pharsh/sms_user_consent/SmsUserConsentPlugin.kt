@@ -56,6 +56,8 @@ class SmsUserConsentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         mActivity = binding.activity
 
         binding.addActivityResultListener { requestCode, resultCode, data ->
+	try {
+
             when (requestCode) {
                 CREDENTIAL_PICKER_REQUEST -> {// Obtain the phone number from the result
                     if (resultCode == Activity.RESULT_OK && data != null) {
@@ -79,6 +81,8 @@ class SmsUserConsentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
                 else -> false
             }
+	} catch(e: Exception) { e.printStackTrace() }
+
         }
     }
 
